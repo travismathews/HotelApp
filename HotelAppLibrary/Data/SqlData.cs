@@ -29,6 +29,40 @@ namespace HotelAppLibrary.Data
         }
 
 
+        public void BookGuest(string firstName, string lastName, DateTime startDate, DateTime endDate, int roomTypeId)
+        {
+            
+            // Query the db for if the guest exists, if not create it and return the guest
+            GuestModel guest = _db.LoadData<GuestModel, dynamic>("dbo.spGuests_Insert", new { firstName, lastName }, connectionStringName, true).First();
+
+            // TODO: Create a stored procedure for this
+            // Get the room type so we can calculate the total cost later from the RoomTypeModel.Price
+            string roomTypeSql = @"select * from dbo.RoomTypes where Id = @Id";
+            RoomTypeModel roomType = _db.LoadData<RoomTypeModel, dynamic>(roomTypeSql, new { Id = roomTypeId }, connectionStringName, false).First();
+
+            // Calcuate number of days for booking
+            // timestaying.Days returns whole number of days so we can calculate totalCost during insert
+            TimeSpan timeStaying = endDate.Date.Subtract(startDate.Date);
+            
+            // Runs a stored procedure that returns a list of available room numbers of the specified type
+            List<RoomModel> availableRooms = _db.LoadData<RoomModel, dynamic>("dbo.spRooms_GetAvailableRooms", new { startDate, endDate, roomTypeId }, connectionStringName, true);
+
+            _db.SaveData("spBookings_Insert",
+                         new
+                         {
+                             //Book the id of the first available room
+                             roomId = availableRooms.First().Id,
+                             guestId = guest.Id,
+                             startDate = startDate,
+                             endDate = endDate,
+                             // Example: totalCost = 6 days * $115 
+                             totalCost = timeStaying.Days * roomType.Price,
+                         },
+                         connectionStringName,
+                         true);
+        }
+
+
 
     }
 }
