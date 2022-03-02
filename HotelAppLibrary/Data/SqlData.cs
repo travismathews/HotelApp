@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HotelAppLibrary.Data
 {
-    public class SqlData
+    public class SqlData : IDatabaseData
     {
         // Store the _db for the life of the SqlData instance
         private readonly ISqlDataAccess _db;
