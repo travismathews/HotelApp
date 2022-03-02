@@ -31,7 +31,7 @@ namespace HotelAppLibrary.Data
 
         public void BookGuest(string firstName, string lastName, DateTime startDate, DateTime endDate, int roomTypeId)
         {
-            
+
             // Query the db for if the guest exists, if not create it and return the guest
             GuestModel guest = _db.LoadData<GuestModel, dynamic>("dbo.spGuests_Insert", new { firstName, lastName }, connectionStringName, true).First();
 
@@ -43,7 +43,7 @@ namespace HotelAppLibrary.Data
             // Calcuate number of days for booking
             // timestaying.Days returns whole number of days so we can calculate totalCost during insert
             TimeSpan timeStaying = endDate.Date.Subtract(startDate.Date);
-            
+
             // Runs a stored procedure that returns a list of available room numbers of the specified type
             List<RoomModel> availableRooms = _db.LoadData<RoomModel, dynamic>("dbo.spRooms_GetAvailableRooms", new { startDate, endDate, roomTypeId }, connectionStringName, true);
 
@@ -62,7 +62,18 @@ namespace HotelAppLibrary.Data
                          true);
         }
 
-
+        public List<BookingFullModel> SearchBookings(string lastName)
+        {
+            // Return a list of bookings using the spbooking stored procedure
+            return _db.LoadData<BookingFullModel, dynamic>("dbo.spBookings_Search",
+                new
+                {
+                    lastName,
+                    startDate = DateTime.Now.Date
+                },
+                connectionStringName,
+                true);
+        }
 
     }
 }
