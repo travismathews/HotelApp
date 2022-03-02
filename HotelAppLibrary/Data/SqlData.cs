@@ -75,5 +75,12 @@ namespace HotelAppLibrary.Data
                 true);
         }
 
+
+        public void CheckInGuest(int bookingId)
+        {
+            // run stored procedure to set the booking with the provided ID to "checked in"
+            _db.SaveData("dbo.spBookings_CheckIn", new { Id = bookingId }, connectionStringName, true);
+        }
+
     }
 }
