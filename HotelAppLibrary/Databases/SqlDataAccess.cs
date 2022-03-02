@@ -10,7 +10,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace HotelAppLibrary.Databases
 {
-    public class SqlDataAccess
+    public class SqlDataAccess : ISqlDataAccess
     {
         // _config saved for life of instanciated SqlDataAccess
         private readonly IConfiguration _config;
@@ -22,13 +22,13 @@ namespace HotelAppLibrary.Databases
         }
 
 
-        public List<T> LoadData<T, U>(string sqlStatement, U parameters, string connectionStringName, dynamic options = null)
+        public List<T> LoadData<T, U>(string sqlStatement, U parameters, string connectionStringName, bool isStoredProcedure = false)
         {
-            // Assume CommandType is text unless we pass in an options parameter that says its a stored procedure
+            // Assume CommandType is text unless we pass in an isStoredProcedure parameter as true
             CommandType commandType = CommandType.Text;
 
-            // Check if options parameter exists, and if it is set to stored procedure
-            if (options.IsStoredProcedure != null && options.IsStoredProcedure == true)
+            // Check if isStoredProcedure parameter is true, and if it is set commandType to stored procedure
+            if (isStoredProcedure == true)
             {
                 // If it is set to stored procedure change the command type for the sql statement below
                 commandType = CommandType.StoredProcedure;
@@ -48,13 +48,13 @@ namespace HotelAppLibrary.Databases
             }
         }
 
-        public void SaveData<T>(string sqlStatement, T parameters, string connectionStringName, dynamic options = null)
+        public void SaveData<T>(string sqlStatement, T parameters, string connectionStringName, bool isStoredProcedure = false)
         {
-            // Assume CommandType is text unless we pass in an options parameter that says its a stored procedure
+            // Assume CommandType is text unless we pass in an isStoredProcedure parameter as true
             CommandType commandType = CommandType.Text;
 
-            // Check if options parameter exists, and if it is set to stored procedure
-            if (options.IsStoredProcedure != null && options.IsStoredProcedure == true)
+            // Check if isStoredProcedure parameter is true, and if it is set commandType to stored procedure
+            if (isStoredProcedure == true)
             {
                 // If it is set to stored procedure change the command type for the sql statement below
                 commandType = CommandType.StoredProcedure;
