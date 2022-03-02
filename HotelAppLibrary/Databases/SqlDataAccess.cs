@@ -48,9 +48,27 @@ namespace HotelAppLibrary.Databases
             }
         }
 
-        public void SaveData<T>(string sqlStatement, T parameters, string connectionStringName, dynamic options == null)
+        public void SaveData<T>(string sqlStatement, T parameters, string connectionStringName, dynamic options = null)
         {
+            // Assume CommandType is text unless we pass in an options parameter that says its a stored procedure
+            CommandType commandType = CommandType.Text;
 
+            // Check if options parameter exists, and if it is set to stored procedure
+            if (options.IsStoredProcedure != null && options.IsStoredProcedure == true)
+            {
+                // If it is set to stored procedure change the command type for the sql statement below
+                commandType = CommandType.StoredProcedure;
+            }
+
+            // Get the connection string from the config
+            string connectionString = _config.GetConnectionString(connectionStringName);
+
+            // Make a connection to the Sql Server and pass in the connection string from the config
+            using (IDbConnection connection = new SqlConnection(connectionString))
+            {
+                // Exectue the provided sqlStatement with parameters and specified command type
+                connection.Execute(sqlStatement, parameters, commandType: commandType);
+            }
         }
     }
 }
