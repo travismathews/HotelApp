@@ -36,8 +36,10 @@ namespace HotelApp.Web.Pages
 
         public void OnGet()
         {
+            // If they have submitted a search with dates
             if (SearchEnabled == true)
             {
+                // Get available room types for the dates provided
                AvailableRoomTypes = _db.GetAvailableRoomTypes(StartDate, EndDate);
             }
         }
@@ -45,9 +47,10 @@ namespace HotelApp.Web.Pages
         public IActionResult OnPost()
         {
 
-
+            // Return to this same page passing the values for the search into post
             return RedirectToPage(new 
             { 
+                // Set Search Enabled which displays the results
                 SearchEnabled = true, 
                 StartDate = StartDate.ToString("yyyy-MM-dd"), 
                 EndDate = EndDate.ToString("yyyy-MM-dd")
